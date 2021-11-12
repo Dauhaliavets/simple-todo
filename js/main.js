@@ -1,76 +1,103 @@
-const listToDo = {
-    "create a task": "In Progress",
-    "make a bed": "Done",
-    "write a post": "To Do",
-}
+const list = [
+    {
+        id: 1,
+        name: 'create post',
+        status: 'To Do',
+        priority: 'low',
+    },
+    {
+        id: 2,
+        name: 'test',
+        status: 'Done',
+        priority: 'high',
+    },
+    {
+        id: 3,
+        name: 'write book',
+        status: 'In Progress',
+        priority: 'high',
+    },
+]
 
-function changeStatus(list, task, newStatus) {
-    for (const listKey in list) {
-        if (listKey === task) {
-            list[listKey] = newStatus;
-        }
-    }
-};
+function addTask(nameTask, status, priority) {
 
-function addTask(list, task, status) {
-    list[task] = status;
-};
+    let idList = list.map(item => item.id);
 
-function deleteTask(list, task) {
-    delete list[task];
-}
-
-function changeFormat(str){
-    return '\t"' + str + '",\n';
-}
-
-function showList(list) {
-
-    const toDo = 'To Do';
-    const inProgress = 'In Progress';
-    const done = 'Done';
-
-    let toDoToString = '';
-    let inProgressToString = '';
-    let doneToString = '';
-
-    let output = '';
-
-    for (const listKey in list) {
-
-        if(list[listKey] === toDo) {
-            toDoToString += changeFormat(listKey);
-        }
-        if(list[listKey] === inProgress) {
-            inProgressToString += changeFormat(listKey);
-        }
-        if(list[listKey] === done) {
-            doneToString += changeFormat(listKey);
-        }
-
+    function getUniqueRandomId(minId, maxId, existId) {
+        let randomNumberInRange = Math.floor(Math.random() * (maxId - minId) + minId);
+        return existId.includes(randomNumberInRange) ? getUniqueRandomId(minId, maxId, existId) : randomNumberInRange;
     }
 
-    toDoToString = toDoToString || '\t-\n';
-    inProgressToString = inProgressToString || '\t-\n';
-    doneToString = doneToString || '\t-\n';
+    let uniqueId = getUniqueRandomId(1, 20, idList);
 
-    // toDoToString === '' ? toDoToString = '\t-\n' : toDoToString;
-    // inProgressToString === '' ? inProgressToString = '\t-\n' : inProgressToString;
-    // doneToString === '' ? doneToString = '\t-\n' : doneToString;
+    list.push({id: uniqueId, name: nameTask, status: status, priority: priority});
 
+}
 
-    output = 'Todo:\n' + toDoToString + 'In Progress:\n' + inProgressToString + 'Done:\n' + doneToString;
+function deleteTask(nameTask) {
 
-    return output;
+    let index = list.findIndex((item) => item.name === nameTask);
+
+    return (index >= 0) && list.splice(index, 1);
+
+    // return list.filter(item => item.name !== nameTask);
+}
+
+function changeStatus(nameTask, newStatus) {
+    list.forEach(item => {
+        if (item.name === nameTask) {
+            item.status = newStatus;
+        }
+    });
+};
+
+function showList(targetGroup = 'status') {
+
+    const sortList = list.sort((a, b) => {
+        // Меняем местами a и b, чтобы отсортировать массив по убыванию названий статуса To Do -> In Progress -> Done
+        if (targetGroup === 'status') {
+            [a, b] = [b, a];
+        }
+        if (a[targetGroup] > b[targetGroup]) {
+            return 1;
+        }
+        if (a[targetGroup] < b[targetGroup]) {
+            return -1;
+        }
+    })
+
+    const mappedList = sortList.map(function (elem, index, array) {
+        if (index > 0 && elem[targetGroup] === array[index - 1][targetGroup]) {
+            return `\n\t${elem.name}`;
+        } else {
+            return `\n${elem[targetGroup]}:\n\t${elem.name}`;
+        }
+    });
+
+    return console.log(mappedList.join().trim());
 
 }
 
 
-console.log("List BEFORE: ", listToDo);
-changeStatus(listToDo, "write a post", "Done");
-addTask(listToDo,'have a walk', "To Do");
-deleteTask(listToDo, 'have a walk');
-changeStatus(listToDo, "make a bed", "To Do");
-deleteTask(listToDo, 'write a post');
-console.log(showList(listToDo));
-console.log("List AFTER: ", listToDo);
+console.log('=================== addTask(\'test 6\', \'Done\', \'low\') ======================================');
+addTask('test 6', 'Done', 'low');
+showList('status');
+console.log('=================== addTask(\'sport\', \'Done\', \'low\') ======================================');
+addTask('sport', 'Done', 'low');
+showList('status');
+console.log('=================== changeStatus(\'sport\', \'In Progress\') ======================================');
+changeStatus('sport', 'In Progress');
+showList('status');
+console.log('=================== deleteTask(\'test 6\') ======================================');
+deleteTask('test 6');
+showList('status');
+console.log('=================== addTask(\'sport\', \'Done\', \'low\') ======================================');
+addTask('driving', 'Done', 'low');
+showList('status');
+
+console.log('=================== showList(\'priority\') ======================================');
+showList('priority');
+console.log('=================== showList(\'status\') ======================================');
+showList('status');
+console.log('=================== showList(\'id\') ======================================');
+showList('id');

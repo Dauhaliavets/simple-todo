@@ -21,13 +21,13 @@ const list = [
 
 function addTask(nameTask, status, priority) {
     let idList = list.map(item => item.id);
-    let uniqueId = getUniqueRandomId(1, 100, idList);
+    let uniqueId = getUniqueRandomIdInRange(1, 100, idList);
     list.push({id: uniqueId, name: nameTask, status, priority});
 }
 
-function getUniqueRandomId(minId, maxId, existId) {
+function getUniqueRandomIdInRange(minId, maxId, existId) {
     let randomNumberInRange = Math.floor(Math.random() * (maxId - minId) + minId);
-    return existId.includes(randomNumberInRange) ? getUniqueRandomId(minId, maxId, existId) : randomNumberInRange;
+    return existId.includes(randomNumberInRange) ? getUniqueRandomIdInRange(minId, maxId, existId) : randomNumberInRange;
 }
 
 function deleteTask(nameTask) {
@@ -43,7 +43,7 @@ function changeStatus(nameTask, newStatus) {
     });
 };
 
-function showList(targetGroup = 'status') {
+function showList(targetGroup) {
     let sortList = list.sort((a, b) => {
         // Меняем местами a и b, чтобы отсортировать массив по убыванию названий статуса To Do -> In Progress -> Done
         if (targetGroup === 'status') {

@@ -22,7 +22,7 @@ const list = [
 function addTask(nameTask, status, priority) {
     let idList = list.map(item => item.id);
     let uniqueId = getUniqueRandomIdInRange(1, 100, idList);
-    list.push({id: uniqueId, name: nameTask, status, priority});
+    list.push( {id: uniqueId, name: nameTask, status: status, priority: priority} );
 }
 
 function getUniqueRandomIdInRange(minId, maxId, existId) {
@@ -36,29 +36,29 @@ function deleteTask(nameTask) {
 }
 
 function changeStatus(nameTask, newStatus) {
-    list.forEach(item => {
-        if (item.name === nameTask) {
-            item.status = newStatus;
-        }
-    });
+    list.forEach(item => (item.name === nameTask) && (item.status = newStatus));
 };
 
+function getUniqueTargets(listName, targetGroup) {
+    return listName
+        .map(item => item[targetGroup])
+        .filter(((item, index, array) => array.indexOf(item) === index));
+}
+
 function showList(targetGroup) {
-    let sortList = list.sort((a, b) => {
-        // Меняем местами a и b, чтобы отсортировать массив по убыванию названий статуса To Do -> In Progress -> Done
-        if (targetGroup === 'status') {
-            [a, b] = [b, a];
-        }
-        return (a[targetGroup] > b[targetGroup]) ? 1 : -1;
-    })
+    let uniqueTargets = getUniqueTargets(list, targetGroup);
+    uniqueTargets.sort((a, b) => {
+        // Меняем местами a и b, чтобы отсорт. массив по убыв.названий статуса To Do -> In Progress -> Done
+        (targetGroup === 'status') && ([a, b] = [b, a]);
+        return (a > b) ? 1 : -1;
+    });
 
-    let output = sortList.map((elem, index, array) => {
-        return (index > 0 && (elem[targetGroup] === array[index - 1][targetGroup]))
-            ? `\n\t${elem.name}`
-            : `\n${elem[targetGroup]}:\n\t${elem.name}`
-        }).join().trim();
-
-    console.log(output);
+    for (const uniqueTarget of uniqueTargets) {
+        console.log(`${uniqueTarget}:`);
+        list
+            .filter(item => item[targetGroup] === uniqueTarget)
+            .forEach(item => console.log(`    ${item.name}`));
+    }
 }
 
 addTask('test 6', 'To Do', 'low');
